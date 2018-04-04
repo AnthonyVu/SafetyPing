@@ -17,6 +17,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
 
     private TcpClient mTcpClient;
@@ -201,7 +204,9 @@ public class MainActivity extends AppCompatActivity {
             String longitude = Double.toString(location.getLongitude());
             Log.e("Lat", latitude);
             Log.e("Long", longitude);
-            message = latitude + " " + longitude + " " + convertedName.replace(" ", "");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentDateTime = dateFormat.format(new Date());
+            message = latitude + " " + longitude + " " + convertedName.replace(" ", "") + " " + currentDateTime;
             mTcpClient.sendMessage(message);
         }
 
