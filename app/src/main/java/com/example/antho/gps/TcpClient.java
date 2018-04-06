@@ -7,6 +7,30 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+
+/*---------------------------------------------------------------------------------------
+--	Source File:    TcpClient.java - A simple Java TCP client
+--
+--	Methods:
+--          sendMessage(fina String message)
+--          stopClient()
+--          run()
+--
+--	Date:			April 3, 2018
+--
+--	Revisions:		(Date and Description)
+--                April 3, 2018
+--                Initialize and Set up Project
+--
+--	Designer:	  Anthony Vu, Li-Yan Tong, Morgan Ariss, John Tee
+--
+--	Programmer:		Anthony Vu
+--
+--	Notes:
+--  This class is responsible for holding the information necessary for connecting
+--  to the server. It also contains a function for sending the clients’ location
+--  information to the server
+---------------------------------------------------------------------------------------*/
 public class TcpClient {
 
     public String SERVER_IP; // = "192.168.0.24"; //server IP address
@@ -18,11 +42,26 @@ public class TcpClient {
     // used to send messages
     private PrintWriter mBufferOut;
 
-    /**
-     * Sends the message entered by client to the server
-     *
-     * @param message text entered by client
-     */
+    /*------------------------------------------------------------------------------------
+    -- FUNCTION: sendMessage(final String message)
+    --
+    -- DATE:  April 3, 2018
+    --
+    -- REVISIONS: April 3, 2018
+    --							Initial file set up
+    --
+    -- DESIGNER: Anthony Vu
+    --
+    -- PROGRAMMER: Anthony Vu
+    --
+    -- INTERFACE: sendMessage(final String message)
+    --             String message - message to send to the server
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    -- Sends a message to the server by creating then utilizing a thread.
+    ---------------------------------------------------------------------------------------*/
     public void sendMessage(final String message) {
         Runnable runnable = new Runnable() {
             @Override
@@ -38,9 +77,25 @@ public class TcpClient {
         thread.start();
     }
 
-    /**
-     * Close the connection and release the members
-     */
+    /*------------------------------------------------------------------------------------
+    -- FUNCTION: stopClient()
+    --
+    -- DATE:  April 3, 2018
+    --
+    -- REVISIONS: April 3, 2018
+    --							Initial file set up
+    --
+    -- DESIGNER: Anthony Vu
+    --
+    -- PROGRAMMER: Anthony Vu
+    --
+    -- INTERFACE: stopClient()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    -- Flushes out the message buffer.
+    ---------------------------------------------------------------------------------------*/
     public void stopClient() {
 
         mRun = false;
@@ -54,6 +109,26 @@ public class TcpClient {
         mServerMessage = null;
     }
 
+    /*------------------------------------------------------------------------------------
+    -- FUNCTION: run()
+    --
+    -- DATE:  April 3, 2018
+    --
+    -- REVISIONS: April 3, 2018
+    --							Initial file set up
+    --
+    -- DESIGNER: Anthony Vu
+    --
+    -- PROGRAMMER: Anthony Vu
+    --
+    -- INTERFACE: run()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    -- Attempts to make a connection to a web server and calls functions required to send
+    -- a string containing location data.
+    ---------------------------------------------------------------------------------------*/
     public void run() {
 
         mRun = true;
@@ -67,19 +142,13 @@ public class TcpClient {
             try {
                 //sends the message to the server
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
             } catch (Exception e) {
-
                 Log.e("TCP", "S: Error", e);
-
             }
 
         } catch (Exception e) {
-
             Log.e("TCP", "C: Error", e);
-
         }
-
     }
 
 }
