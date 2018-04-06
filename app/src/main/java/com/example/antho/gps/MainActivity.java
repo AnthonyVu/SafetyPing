@@ -20,6 +20,38 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
+/*---------------------------------------------------------------------------------------
+--	Source File:    MainActivity.java - An Android Application that connects and sends
+--                                      device location data to a web server.
+--
+--	Classes:	MyLocationListener  - location listener class
+--				ConnectTask - An Asynchronous task to manage the connection
+--              TcpClient - TCP class
+--
+--	Methods:
+--				onCreate 	        (Android Constructor)
+--				onClick  	        (Android Button listener)
+--              onStop              (Android in background function)
+--
+--
+--	Date:			April 3, 2018
+--
+--	Revisions:	(Date and Description)
+--                April 3, 2018
+--                Initialize and Set up Project
+--                April 5, 2018
+--                Code comments and update send file data.
+--
+--	Designer:		Anthony Vu, Li-Yan Tong, Morgan Ariss, John Tee
+--
+--	Programmer:		Anthony Vu
+--
+--	Notes:
+--	Entry point of the Android TCP Client Program.  This program sends the Android device's
+--  Geographic location information via a mobile data/wifi internet connection using the
+--  TCP/IP protocol to a remote Server application.
+---------------------------------------------------------------------------------------*/
 public class MainActivity extends AppCompatActivity {
 
     private TcpClient mTcpClient;
@@ -36,12 +68,39 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private boolean set1, set2, set3, connected;
 
+    /*------------------------------------------------------------------------------------
+    -- FUNCTION: onCreate(Bundle savedInstanceState)
+    --
+    -- DATE:  April 3, 2018
+    --
+    -- REVISIONS: April 3, 2018
+    --							Initial file set up
+    --
+    -- DESIGNER: Anthony Vu
+    --
+    -- PROGRAMMER: Anthony Vu
+    --
+    -- INTERFACE: onCreate(Bundle savedInstanceState)
+    --            savedInstanceState - Saved instance of this program
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    -- First function in the activity life cycle, called immediately when the android
+    -- application is started. Creates and forms the connection with the server and creates
+    -- a location manager.
+    --
+    -- Once a connection is formed the client constantly communicates its location to the server,
+    -- as a service in the background. This function also handles many of the UI options from
+    -- the layout (button handling). Also handles requesting the necessary GPS and online permissions.
+    ---------------------------------------------------------------------------------------*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},1);
 
         set1 = false;
         set2 = false;
@@ -49,6 +108,28 @@ public class MainActivity extends AppCompatActivity {
         connected = false;
         connect = (Button) findViewById(R.id.connect);
         connect.setOnClickListener(new View.OnClickListener() {
+
+            /*------------------------------------------------------------------------------------
+            -- FUNCTION: onClick(View v)
+            --
+            -- DATE:  April 3, 2018
+            --
+            -- REVISIONS: April 3, 2018
+            --							Initial file set up
+            --
+            -- DESIGNER: Anthony Vu
+            --
+            -- PROGRAMMER: Anthony Vu
+            --
+            -- INTERFACE: onClick(View v)
+            --            v - Android GUI user interacts with
+            --
+            -- RETURNS: void
+            --
+            -- NOTES:
+            -- Handles finding the device location and updating the location after the user clicks
+            -- the connect button.
+            ---------------------------------------------------------------------------------------*/
             @Override
             public void onClick(View v) {
                 if(set1 && set2 && set3) {
@@ -58,18 +139,11 @@ public class MainActivity extends AppCompatActivity {
                     locationListener = new MyLocationListener();
 
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
                         Toast.makeText(MainActivity.this, "fail permission", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
 
                     //disable button once clicked or if no ip/port specified
                     //enable when close button is clicked
@@ -170,6 +244,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /*------------------------------------------------------------------------------------
+    -- FUNCTION: onStop()
+    --
+    -- DATE:  April 3, 2018
+    --
+    -- REVISIONS: April 3, 2018
+    --							Initial file set up
+    --
+    -- DESIGNER: Anthony Vu
+    --
+    -- PROGRAMMER: Anthony Vu
+    --
+    -- INTERFACE: onStop()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    -- Handles stopping the program and disconnecting from the server.
+    ---------------------------------------------------------------------------------------*/
     @Override
     protected void onStop() {
         if(connected) {
@@ -197,6 +290,27 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Lat", "enable");
         }
 
+        /*------------------------------------------------------------------------------------
+        -- FUNCTION: onLocationChanged(Location location)
+        --
+        -- DATE:  April 3, 2018
+        --
+        -- REVISIONS: April 3, 2018
+        --							Initial file set up
+        --
+        -- DESIGNER: Anthony Vu
+        --
+        -- PROGRAMMER: Anthony Vu
+        --
+        -- INTERFACE: onLocationChanged(Location location)
+        --              location - Location of device in latitude and longitude
+        --
+        -- RETURNS: void
+        --
+        -- NOTES:
+        -- This function is responsible for sending the location and time of the client to
+        -- the server to be displayed.
+        ---------------------------------------------------------------------------------------*/
         @Override
         public void onLocationChanged(Location location) {
             Log.d("Lat", "Location");
@@ -204,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
             String longitude = Double.toString(location.getLongitude());
             Log.e("Lat", latitude);
             Log.e("Long", longitude);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
             String currentDateTime = dateFormat.format(new Date());
             message = latitude + " " + longitude + " " + convertedName.replace(" ", "") + " " + currentDateTime;
             mTcpClient.sendMessage(message);
